@@ -74,6 +74,12 @@ export default function KioskQueue() {
 
   return (
     <main className="container mx-auto max-w-2xl px-4 py-6 pb-10">
+      {/* ─── RUBRIK ──────────────────────────────────────────── */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight gradient-text">Kö</h1>
+        <p className="text-sm text-text-primary/40 mt-1">Trainstation Makerspace</p>
+      </div>
+
       {!isSupabaseConfigured && (
         <p className="mb-4 rounded bg-card-bg p-4 text-text-primary/70 text-sm">
           Supabase är inte konfigurerad.

@@ -69,11 +69,11 @@ export default function StaffQueue({ staffName, staffRole }: Props) {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-text-primary">
-            Kö ({queue.filter((q) => q.status === "waiting").length} väntande)
+          <h1 className="text-2xl font-bold tracking-tight gradient-text">
+            Kö
           </h1>
-          <p className="text-sm text-text-primary/50">
-            Inloggad som {staffName} · {staffRole}
+          <p className="text-sm text-text-primary/50 mt-0.5">
+            {queue.filter((q) => q.status === "waiting").length} väntande · {staffName}
           </p>
         </div>
       </div>

@@ -57,9 +57,12 @@ export default function RemoteQueue() {
 
   return (
     <main className="container mx-auto max-w-sm px-4 py-6">
-      <p className="mb-1 text-xs text-text-primary/40 uppercase tracking-widest text-center">
-        Realtidskö
-      </p>
+      <div className="mb-5 text-center">
+        <h1 className="text-2xl font-bold tracking-tight gradient-text">Kö</h1>
+        <p className="text-xs text-text-primary/40 mt-1 uppercase tracking-widest">
+          Realtid · Trainstation
+        </p>
+      </div>
 
       {/* NU BETJÄNAS */}
       <section className="mb-4">

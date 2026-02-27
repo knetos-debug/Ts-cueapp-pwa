@@ -80,8 +80,8 @@ export default function LoginUI() {
     <div className="flex min-h-screen items-center justify-center bg-bg-main px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <h1 className="text-2xl font-bold text-text-primary">Trainstation</h1>
-          <p className="mt-1 text-sm text-text-primary/50">Köapp — logga in</p>
+          <h1 className="text-3xl font-bold tracking-tight gradient-text">trainstation</h1>
+          <p className="mt-2 text-sm text-text-primary/50">Köapp — logga in</p>
         </div>
         <Suspense fallback={
           <div className="rounded-2xl bg-card-bg p-6 text-center text-sm text-text-primary/50">
