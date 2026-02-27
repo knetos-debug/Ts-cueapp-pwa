@@ -30,7 +30,11 @@ export async function joinQueue(
     .from("queue")
     .insert({ user_id, category, status: "waiting" });
 
-  return error ? { error: error.message } : {};
+  if (error) {
+    if (error.code === "23505") return { error: "Den här personen står redan i kön." };
+    return { error: "Åtgärden misslyckades. Försök igen." };
+  }
+  return {};
 }
 
 /**
@@ -45,7 +49,7 @@ export async function deleteQueueEntry(
   }
 
   const { error } = await adminClient().from("queue").delete().eq("id", id);
-  return error ? { error: error.message } : {};
+  return error ? { error: "Åtgärden misslyckades. Försök igen." } : {};
 }
 
 /**
@@ -65,7 +69,7 @@ export async function updateQueueStatus(
     .update({ status })
     .eq("id", id);
 
-  return error ? { error: error.message } : {};
+  return error ? { error: "Åtgärden misslyckades. Försök igen." } : {};
 }
 
 /**
@@ -85,5 +89,5 @@ export async function updateStationStatus(
     .update({ status, updated_at: new Date().toISOString() })
     .eq("id", id);
 
-  return error ? { error: error.message } : {};
+  return error ? { error: "Åtgärden misslyckades. Försök igen." } : {};
 }

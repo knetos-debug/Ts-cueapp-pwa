@@ -15,7 +15,10 @@ type AppUser = {
 
 export default async function AdminPage() {
   const session = await getSession();
-  if (!session) redirect("/login");
+  // Dubbel-koll — middleware skyddar också, men defense in depth
+  if (!session || (session.role !== "admin" && session.role !== "superuser")) {
+    redirect("/");
+  }
 
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
