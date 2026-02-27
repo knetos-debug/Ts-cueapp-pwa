@@ -1,23 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/browser";
+import { useTransition } from "react";
+import { logoutAction } from "@/app/actions/auth";
+import { btn, btnBase } from "@/lib/buttonStyles";
 
 export default function LogoutButton() {
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
-    router.push("/staff/login");
-  };
+  const [isPending, startTransition] = useTransition();
 
   return (
     <button
-      onClick={handleLogout}
-      className="rounded bg-zinc-600 px-6 py-2 text-sm text-white hover:bg-zinc-700"
+      onClick={() => startTransition(() => logoutAction())}
+      disabled={isPending}
+      className={`${btnBase} ${btn.zinc}`}
     >
-      Logga ut
+      {isPending ? "Loggar ut…" : "Logga ut"}
     </button>
   );
 }

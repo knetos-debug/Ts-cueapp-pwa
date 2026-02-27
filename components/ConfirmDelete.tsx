@@ -23,8 +23,7 @@ export default function ConfirmDelete({
   const handleDelete = async () => {
     setDeleting(true);
     setError("");
-    // Tomt adminInput → server action kollar authenticated session
-    const result = await deleteQueueEntry(queueId, "");
+    const result = await deleteQueueEntry(queueId);
     setDeleting(false);
     if (result.error) {
       setError(result.error);

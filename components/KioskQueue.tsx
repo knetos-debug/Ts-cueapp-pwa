@@ -24,14 +24,9 @@ export default function KioskQueue() {
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [stations, setStations] = useState<Station[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [hasKioskSecret, setHasKioskSecret] = useState(false);
   const [appUrl, setAppUrl] = useState("");
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const fromUrl = params.get("kiosk");
-    if (fromUrl) sessionStorage.setItem("kiosk_secret", fromUrl);
-    setHasKioskSecret(!!sessionStorage.getItem("kiosk_secret"));
     setAppUrl(window.location.origin);
   }, []);
 
@@ -64,8 +59,7 @@ export default function KioskQueue() {
   }, []);
 
   const handleJoinSubmit = async (user_id: string, category: string) => {
-    const kiosk_secret = sessionStorage.getItem("kiosk_secret") ?? "";
-    const result = await joinQueue(user_id, category, kiosk_secret);
+    const result = await joinQueue(user_id, category);
     if (result.error) throw new Error(result.error);
   };
 
@@ -167,14 +161,12 @@ export default function KioskQueue() {
       )}
 
       {/* ─── GÅ MED-KNAPP ────────────────────────────────────── */}
-      {hasKioskSecret && (
-        <button
-          onClick={() => setModalOpen(true)}
-          className="mb-6 w-full rounded-2xl bg-green-600 py-5 text-xl font-bold text-white hover:bg-green-700 active:scale-95 transition-transform"
-        >
-          Ställ dig i kön  +
-        </button>
-      )}
+      <button
+        onClick={() => setModalOpen(true)}
+        className="mb-6 w-full rounded-2xl bg-green-600 py-5 text-xl font-bold text-white hover:bg-green-700 active:scale-95 transition-transform"
+      >
+        Ställ dig i kön  +
+      </button>
 
       {/* ─── MASKINSTATUS ────────────────────────────────────── */}
       {stations.length > 0 && (
