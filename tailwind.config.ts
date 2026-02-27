@@ -9,10 +9,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "bg-main": "hsl(225, 10%, 14%)",
-        "nav-bg": "hsl(225, 14%, 8%)",
-        "card-bg": "hsl(225, 8%, 19%)",
-        "text-primary": "hsl(220, 12%, 96%)",
+        "bg-main": "hsl(200, 2%, 21%)",   /* --neutral-100 */
+        "nav-bg": "hsl(200, 2%, 12%)",   /* mörkare än bg för nav-separation */
+        "card-bg": "hsl(200, 2%, 30%)",  /* --neutral-90 */
+        "text-primary": "hsl(200, 7%, 97%)",
         "accent-ink": "hsl(357, 68%, 18%)",
       },
       fontFamily: {
