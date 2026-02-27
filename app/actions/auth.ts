@@ -62,15 +62,8 @@ export async function loginAction(
     secure: process.env.NODE_ENV === "production",
   });
 
-  // Redirect baserat på roll
-  const dest =
-    data.role === "kiosk"
-      ? "/"  // kiosk-enheten hamnar alltid på startsidan (kiosk-vyn)
-      : data.role === "admin" || data.role === "superuser" || data.role === "user"
-      ? "/staff"
-      : "/staff";
-
-  redirect(dest);
+  // Kiosk → rot (kiosk-vy), alla andra → staffvyn
+  redirect(data.role === "kiosk" ? "/" : "/staff");
 }
 
 // ---------------------------------------------------------------------------
@@ -79,7 +72,7 @@ export async function loginAction(
 export async function logoutAction(): Promise<void> {
   const cookieStore = await cookies();
   cookieStore.delete(SESSION_COOKIE);
-  redirect("/login");
+  redirect("/");
 }
 
 // ---------------------------------------------------------------------------

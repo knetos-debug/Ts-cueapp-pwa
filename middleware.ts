@@ -28,49 +28,42 @@ async function getSessionFromRequest(
 
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
-
   const session = await getSessionFromRequest(req);
   const rank = session ? ROLE_RANK[session.role] : 0;
 
   // /admin → superuser eller admin
   if (pathname.startsWith("/admin")) {
     if (rank < ROLE_RANK.superuser) {
-      return NextResponse.redirect(
-        new URL(session ? "/login?unauthorized=1" : "/login", req.url)
-      );
+      // Ej behörig → tillbaka till rot (visar login eller ?unauthorized)
+      const url = req.nextUrl.clone();
+      url.pathname = "/";
+      if (session) url.searchParams.set("unauthorized", "1");
+      return NextResponse.redirect(url);
     }
   }
 
   // /staff → user, superuser, admin
   if (pathname.startsWith("/staff")) {
     if (rank < ROLE_RANK.user) {
-      return NextResponse.redirect(
-        new URL(session ? "/login?unauthorized=1" : "/login", req.url)
-      );
+      const url = req.nextUrl.clone();
+      url.pathname = "/";
+      if (session) url.searchParams.set("unauthorized", "1");
+      return NextResponse.redirect(url);
     }
-    // Kiosk-roll ska inte kunna besöka /staff
+    // Kiosk-roll hör hemma på /
     if (session?.role === "kiosk") {
       return NextResponse.redirect(new URL("/", req.url));
     }
   }
 
-  // / (kiosk-vy) kräver inloggning
-  if (pathname === "/") {
-    if (!session) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-    // user/superuser/admin som besöker / skickas till /staff
-    if (rank >= ROLE_RANK.user) {
-      return NextResponse.redirect(new URL("/staff", req.url));
-    }
-  }
+  // / — rot-sidan hanterar login/kiosk/redirect själv (ingen middleware-redirect hit)
 
   return NextResponse.next();
 }
 
 export const config = {
-  // Matcha allt utom statiska filer, /login och /queue (publika)
+  // Matcha allt utom statiska filer och /queue (publik)
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|login|queue).*)",
+    "/((?!_next/static|_next/image|favicon.ico|queue).*)",
   ],
 };

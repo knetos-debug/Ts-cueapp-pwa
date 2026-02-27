@@ -26,16 +26,12 @@ function LoginForm() {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl bg-card-bg p-6 shadow-lg space-y-4"
-    >
+    <form onSubmit={handleSubmit} className="rounded-2xl bg-card-bg p-6 shadow-lg space-y-4">
       {error && (
         <div className="rounded-lg bg-red-900/40 border border-red-600/40 px-4 py-3 text-sm text-red-300">
           {error}
         </div>
       )}
-
       <div className="space-y-1">
         <label htmlFor="username" className="block text-xs font-medium text-text-primary/60 uppercase tracking-wider">
           Användarnamn
@@ -52,7 +48,6 @@ function LoginForm() {
           placeholder="ditt användarnamn"
         />
       </div>
-
       <div className="space-y-1">
         <label htmlFor="password" className="block text-xs font-medium text-text-primary/60 uppercase tracking-wider">
           Lösenord
@@ -69,7 +64,6 @@ function LoginForm() {
           placeholder="••••••••"
         />
       </div>
-
       <button
         type="submit"
         disabled={isPending || !username || !password}
@@ -81,7 +75,7 @@ function LoginForm() {
   );
 }
 
-export default function LoginPage() {
+export default function LoginUI() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-bg-main px-4">
       <div className="w-full max-w-sm">

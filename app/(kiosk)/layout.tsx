@@ -1,10 +1,19 @@
+import { getSession } from "@/lib/auth/session";
 import MakerspaceBanner from "@/components/MakerspaceBanner";
 
-export default function KioskLayout({
+export default async function KioskLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const session = await getSession();
+  const showBanner = session?.role === "kiosk";
+
+  if (!showBanner) {
+    // Login-vyn eller redirect — ingen banner
+    return <>{children}</>;
+  }
+
   return (
     <>
       <header className="relative w-full overflow-hidden">
