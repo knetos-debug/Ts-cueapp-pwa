@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { getSession, hasRole } from "@/lib/auth/session";
-import LogoutButton from "./LogoutButton";
+import { getSession } from "@/lib/auth/session";
+import { redirect } from "next/navigation";
+import AppNav from "@/components/AppNav";
 
 export default async function StaffLayout({
   children,
@@ -8,35 +8,11 @@ export default async function StaffLayout({
   children: React.ReactNode;
 }) {
   const session = await getSession();
-  const canAdmin = hasRole(session, "superuser");
+  if (!session) redirect("/login");
 
   return (
     <div className="min-h-screen bg-bg-main">
-      {/* Top nav */}
-      <nav className="flex items-center justify-between border-b border-text-primary/10 bg-card-bg px-4 py-3">
-        <div className="flex items-center gap-6">
-          <span className="font-bold text-text-primary">Trainstation</span>
-          <Link
-            href="/staff"
-            className="text-sm font-medium text-text-primary hover:text-text-primary/80"
-          >
-            Kö
-          </Link>
-          {canAdmin && (
-            <Link
-              href="/admin"
-              className="text-sm font-medium text-text-primary hover:text-text-primary/80"
-            >
-              Användare
-            </Link>
-          )}
-          <span className="text-sm text-text-primary/30" title="Kommer i Fas 4">
-            Statistik
-          </span>
-        </div>
-        <LogoutButton />
-      </nav>
-
+      <AppNav session={session} />
       {children}
     </div>
   );

@@ -126,7 +126,40 @@ export async function createUserAction(
 }
 
 // ---------------------------------------------------------------------------
-// UPPDATERA ANVÄNDARE (lösenord, namn, aktiv-status)
+// BYT EGET LÖSENORD (alla inloggade användare)
+// ---------------------------------------------------------------------------
+export async function changeOwnPasswordAction(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ error?: string }> {
+  const session = await getSession();
+  if (!session) return { error: "Inte inloggad." };
+
+  const { data } = await supabase
+    .from("app_users")
+    .select("password_hash")
+    .eq("id", session.id)
+    .single<{ password_hash: string }>();
+
+  if (!data) return { error: "Användaren hittades inte." };
+
+  const ok = await verifyPassword(currentPassword, data.password_hash);
+  if (!ok) return { error: "Nuvarande lösenord stämmer inte." };
+
+  if (newPassword.length < 6) return { error: "Nytt lösenord måste vara minst 6 tecken." };
+
+  const password_hash = await hashPassword(newPassword);
+  const { error } = await supabase
+    .from("app_users")
+    .update({ password_hash })
+    .eq("id", session.id);
+
+  if (error) return { error: "Kunde inte spara lösenordet." };
+  return {};
+}
+
+// ---------------------------------------------------------------------------
+// UPPDATERA ANVÄNDARE (lösenord, namn, aktiv-status) — kräver superuser+
 // ---------------------------------------------------------------------------
 type UpdateUserInput = {
   id: string;
@@ -144,20 +177,26 @@ export async function updateUserAction(
   // Hämta målanvändaren
   const { data: target } = await supabase
     .from("app_users")
-    .select("role, username")
+    .select("role")
     .eq("id", input.id)
-    .single<{ role: SessionPayload["role"]; username: string }>();
+    .single<{ role: SessionPayload["role"] }>();
 
   if (!target) return { error: "Användaren hittades inte." };
 
-  // Kan bara redigera roller med lägre rank
-  const sessionRank = { admin: 4, superuser: 3, user: 2, kiosk: 1 }[session!.role];
-  const targetRank = { admin: 4, superuser: 3, user: 2, kiosk: 1 }[target.role];
-  if (targetRank >= sessionRank) return { error: "Ej behörig att redigera denna användare." };
+  const RANK = { admin: 4, superuser: 3, user: 2, kiosk: 1 };
+  const sessionRank = RANK[session!.role];
+  const targetRank = RANK[target.role];
+
+  // Egna kontot kan alltid redigeras (byt namn/lösenord)
+  const isSelf = input.id === session!.id;
+  if (!isSelf && targetRank >= sessionRank) {
+    return { error: "Ej behörig att redigera denna användare." };
+  }
 
   const updates: Record<string, unknown> = {};
   if (input.display_name !== undefined) updates.display_name = input.display_name.trim();
-  if (input.active !== undefined) updates.active = input.active;
+  // Aktiv-status kan inte ändras på det egna kontot
+  if (input.active !== undefined && !isSelf) updates.active = input.active;
   if (input.new_password) {
     updates.password_hash = await hashPassword(input.new_password);
     if (target.role === "kiosk") updates.visible_password = input.new_password;
