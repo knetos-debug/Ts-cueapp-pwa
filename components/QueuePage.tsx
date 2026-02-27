@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
+import { joinQueue } from "@/app/actions/queue";
 import JoinQueueModal from "./JoinQueueModal";
 import AdminAuth from "./AdminAuth";
 
@@ -18,6 +19,17 @@ export default function QueuePage() {
   const [queue, setQueue] = useState<QueueEntry[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [adminAuthFor, setAdminAuthFor] = useState<string | null>(null);
+  const [hasKioskSecret, setHasKioskSecret] = useState(false);
+
+  // Läs kiosk-nyckel från URL (?kiosk=xxx) och spara i sessionStorage
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const fromUrl = params.get("kiosk");
+    if (fromUrl) {
+      sessionStorage.setItem("kiosk_secret", fromUrl);
+    }
+    setHasKioskSecret(!!sessionStorage.getItem("kiosk_secret"));
+  }, []);
 
   useEffect(() => {
     const client = supabase;
@@ -48,13 +60,9 @@ export default function QueuePage() {
   }, []);
 
   const handleJoinSubmit = async (user_id: string, category: string) => {
-    if (!supabase) throw new Error("Supabase är inte konfigurerad.");
-    const { error } = await supabase.from("queue").insert({
-      user_id,
-      category,
-      status: "waiting",
-    });
-    if (error) throw error;
+    const kiosk_secret = sessionStorage.getItem("kiosk_secret") ?? "";
+    const result = await joinQueue(user_id, category, kiosk_secret);
+    if (result.error) throw new Error(result.error);
   };
 
   const handleDeleteRequest = (id: string) => {
@@ -69,13 +77,15 @@ export default function QueuePage() {
     <main className="container mx-auto px-4 py-6">
       <header className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold text-text-primary">Kö</h1>
-        <button
-          onClick={() => setModalOpen(true)}
-          className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-ink text-2xl text-text-primary shadow-lg hover:opacity-90"
-          aria-label="Gå med i kö"
-        >
-          +
-        </button>
+        {hasKioskSecret && (
+          <button
+            onClick={() => setModalOpen(true)}
+            className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-ink text-2xl text-text-primary shadow-lg hover:opacity-90"
+            aria-label="Gå med i kö"
+          >
+            +
+          </button>
+        )}
       </header>
 
       {!isSupabaseConfigured && (
@@ -122,7 +132,10 @@ export default function QueuePage() {
 
       {queue.length === 0 && isSupabaseConfigured && (
         <p className="rounded bg-card-bg p-6 text-center text-text-primary/70">
-          Köen är tom. Tryck på + för att gå med.
+          Köen är tom.{" "}
+          {hasKioskSecret
+            ? "Tryck på + för att gå med."
+            : "Öppna kiosk-URL:en för att ställa dig i kön."}
         </p>
       )}
 
