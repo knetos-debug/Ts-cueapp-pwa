@@ -85,3 +85,71 @@ export async function deleteQueueEntry(
 
   return { error: "Fel lösenord eller ogiltig QR." };
 }
+
+/**
+ * Uppdatera status på en köpost (kräver inloggad staff-session).
+ */
+export async function updateQueueStatus(
+  id: string,
+  status: "in_progress" | "done"
+): Promise<{ error?: string }> {
+  try {
+    const supabase = await createServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { error: "Inte inloggad." };
+
+    const { data: staffMember } = await supabase
+      .from("staff")
+      .select("id")
+      .eq("id", user.id)
+      .single();
+
+    if (!staffMember) return { error: "Ej behörig." };
+
+    const { error } = await supabase
+      .from("queue")
+      .update({ status })
+      .eq("id", id);
+
+    return error ? { error: error.message } : {};
+  } catch {
+    return { error: "Serverfel." };
+  }
+}
+
+/**
+ * Uppdatera status på en maskin/station (kräver inloggad staff-session).
+ */
+export async function updateStationStatus(
+  id: string,
+  status: "available" | "maintenance"
+): Promise<{ error?: string }> {
+  try {
+    const supabase = await createServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return { error: "Inte inloggad." };
+
+    const { data: staffMember } = await supabase
+      .from("staff")
+      .select("id")
+      .eq("id", user.id)
+      .single();
+
+    if (!staffMember) return { error: "Ej behörig." };
+
+    const { error } = await supabase
+      .from("stations")
+      .update({ status, updated_at: new Date().toISOString() })
+      .eq("id", id);
+
+    return error ? { error: error.message } : {};
+  } catch {
+    return { error: "Serverfel." };
+  }
+}

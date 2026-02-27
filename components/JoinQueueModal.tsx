@@ -2,32 +2,32 @@
 
 import { useState, useEffect, useRef } from "react";
 import { Html5Qrcode } from "html5-qrcode";
+import { CATEGORIES, type Category } from "@/lib/categories";
+import { btn, btnBase } from "@/lib/buttonStyles";
+import CategoryCard from "./CategoryCard";
 
-const CATEGORIES = [
-  "3D-print",
-  "Laserskärning",
-  "Plotter",
-  "Printing",
-  "Tröjtryck",
-  "Muggtryck",
-  "CNC/Verkstad",
-] as const;
+type QueueEntry = { category: string };
 
 type JoinQueueModalProps = {
   onClose: () => void;
   onSubmit: (user_id: string, category: string) => Promise<void>;
+  queue?: QueueEntry[];
 };
 
 export default function JoinQueueModal({
   onClose,
   onSubmit,
+  queue = [],
 }: JoinQueueModalProps) {
   const [user_id, setUser_id] = useState("");
-  const [category, setCategory] = useState<string>(CATEGORIES[0]);
+  const [category, setCategory] = useState<Category>(CATEGORIES[0]);
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const scannerRef = useRef<Html5Qrcode | null>(null);
+
+  const countFor = (cat: string) =>
+    queue.filter((e) => e.category === cat).length;
 
   useEffect(() => {
     if (!scanning) return;
@@ -76,25 +76,24 @@ export default function JoinQueueModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
-      <div className="max-h-[90vh] w-full max-w-md overflow-y-auto rounded-lg bg-card-bg p-6 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-text-primary">
-            Gå med i kö
-          </h2>
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center p-4">
+      <div className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-2xl bg-card-bg p-6 shadow-xl">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-text-primary">Ställ dig i kö</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-2 text-text-primary/70 hover:bg-text-primary/10 hover:text-text-primary"
+            className="rounded-lg p-2 text-text-primary/50 hover:bg-text-primary/10 hover:text-text-primary"
             aria-label="Stäng"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Medlems-ID */}
           <div>
-            <label className="mb-1 block text-sm text-text-primary/80">
+            <label className="mb-2 block text-sm font-medium text-text-primary/80">
               Medlems-ID
             </label>
             <div className="flex gap-2">
@@ -103,54 +102,55 @@ export default function JoinQueueModal({
                 value={user_id}
                 onChange={(e) => setUser_id(e.target.value)}
                 placeholder="Skriv eller skanna QR"
-                className="flex-1 rounded border border-text-primary/20 bg-bg-main px-4 py-2 text-text-primary placeholder:text-text-primary/50 focus:border-accent-ink focus:outline-none focus:ring-1 focus:ring-accent-ink"
+                className="flex-1 rounded-xl border border-text-primary/20 bg-bg-main px-4 py-3 text-text-primary placeholder:text-text-primary/40 focus:border-accent-ink focus:outline-none"
               />
               <button
                 type="button"
                 onClick={() => setScanning(true)}
                 disabled={scanning}
-                className="rounded bg-accent-ink px-4 py-2 text-text-primary hover:opacity-90 disabled:opacity-50"
+                className={`rounded-xl px-4 py-3 text-sm font-medium transition-colors ${btn.zinc} disabled:opacity-50`}
               >
-                {scanning ? "Skannar…" : "Skanna"}
+                {scanning ? "Skannar…" : "📷 QR"}
               </button>
             </div>
           </div>
 
           {scanning && (
-            <div id="qr-reader" className="rounded overflow-hidden" />
+            <div id="qr-reader" className="overflow-hidden rounded-xl" />
           )}
 
+          {/* Kategori-kort */}
           <div>
-            <label className="mb-1 block text-sm text-text-primary/80">
-              Kategori
+            <label className="mb-2 block text-sm font-medium text-text-primary/80">
+              Välj kategori
             </label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full rounded border border-text-primary/20 bg-bg-main px-4 py-2 text-text-primary focus:border-accent-ink focus:outline-none focus:ring-1 focus:ring-accent-ink"
-            >
-              {CATEGORIES.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {CATEGORIES.map((cat) => (
+                <CategoryCard
+                  key={cat}
+                  category={cat}
+                  count={countFor(cat)}
+                  selected={category === cat}
+                  onClick={() => setCategory(cat)}
+                />
               ))}
-            </select>
+            </div>
           </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
 
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 rounded py-2 text-text-primary ring-1 ring-text-primary/30 hover:bg-text-primary/10"
+              className={`flex-1 ${btnBase} ${btn.zinc}`}
             >
               Avbryt
             </button>
             <button
               type="submit"
-              disabled={submitting}
-              className="flex-1 rounded bg-accent-ink py-2 text-text-primary hover:opacity-90 disabled:opacity-50"
+              disabled={submitting || !user_id.trim()}
+              className={`flex-1 ${btnBase} ${btn.green} disabled:opacity-50`}
             >
               {submitting ? "Skickar…" : "Gå med"}
             </button>
