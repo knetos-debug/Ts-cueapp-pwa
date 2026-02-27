@@ -10,7 +10,7 @@ export default function MakerspaceBanner() {
   return (
     <div
       className="relative w-full overflow-hidden"
-      style={{ aspectRatio: "3000/800", minHeight: "200px" }}
+      style={{ aspectRatio: "3000/800", minHeight: "80px", maxHeight: "140px" }}
       aria-hidden
     >
       {/* Background: Trainstation banner pattern */}
@@ -27,7 +27,7 @@ export default function MakerspaceBanner() {
         <img
           src="/trainstation-logo.svg"
           alt="Trainstation"
-          className="h-[20%] min-h-[60px] w-auto max-w-[80%] object-contain drop-shadow-lg md:h-[25%]"
+          className="h-[50%] min-h-[36px] w-auto max-w-[70%] object-contain drop-shadow-lg"
         />
       </div>
     </div>
