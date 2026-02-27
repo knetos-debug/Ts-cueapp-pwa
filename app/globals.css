@@ -5,8 +5,8 @@
 :root {
   --bg-main: hsl(225, 10%, 8%);
   --nav-bg: hsl(225, 16%, 5%);
-  --card-bg: hsl(225, 9%, 14%);
-  --text-primary: hsl(220, 12%, 95%);
+  --card-bg: hsl(225, 8%, 22%);
+  --text-primary: hsl(220, 12%, 96%);
   --accent-ink: hsl(357, 68%, 18%);
 }
 
