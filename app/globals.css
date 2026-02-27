@@ -3,9 +3,9 @@
 @tailwind utilities;
 
 :root {
-  --bg-main: hsl(225, 10%, 8%);
-  --nav-bg: hsl(225, 16%, 5%);
-  --card-bg: hsl(225, 8%, 22%);
+  --bg-main: hsl(225, 10%, 14%);
+  --nav-bg: hsl(225, 14%, 8%);
+  --card-bg: hsl(225, 8%, 19%);
   --text-primary: hsl(220, 12%, 96%);
   --accent-ink: hsl(357, 68%, 18%);
 }
