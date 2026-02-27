@@ -24,10 +24,10 @@ export default function RootLayout({
       <body className="min-h-screen bg-bg-main text-text-primary antialiased font-sans">
         <header className="relative w-full overflow-hidden">
           <MakerspaceBanner />
-          <div className="relative px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
-            {children}
-          </div>
         </header>
+        <div className="px-[env(safe-area-inset-left)] pr-[env(safe-area-inset-right)] pt-4 pb-[env(safe-area-inset-bottom)]">
+          {children}
+        </div>
       </body>
     </html>
   );
