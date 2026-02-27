@@ -68,7 +68,7 @@ export default function QueuePage() {
   return (
     <main className="container mx-auto px-4 py-6">
       <header className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-text-primary">Kön</h1>
+        <h1 className="text-2xl font-bold text-text-primary">Kö</h1>
         <button
           onClick={() => setModalOpen(true)}
           className="flex h-12 w-12 items-center justify-center rounded-full bg-accent-ink text-2xl text-text-primary shadow-lg hover:opacity-90"
