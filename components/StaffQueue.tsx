@@ -116,7 +116,7 @@ export default function StaffQueue({ staffName, staffRole }: Props) {
                       <>
                         <button
                           onClick={() =>
-                            act(() => updateQueueStatus(e.id, "in_progress"), `serve-${e.id}`)
+                            act(() => updateQueueStatus(e.id, "in_progress", staffName), `serve-${e.id}`)
                           }
                           disabled={loading === `serve-${e.id}`}
                           className={`${btnBase} ${btn.green}`}

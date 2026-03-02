@@ -11,6 +11,7 @@ type QueueEntry = {
   category: string;
   status: string;
   created_at: string;
+  served_by: string | null;
 };
 
 function estWait(count: number) {
@@ -30,7 +31,7 @@ export default function RemoteQueue() {
       const [qRes, sRes] = await Promise.all([
         s
           .from("queue")
-          .select("id, user_id, category, status, created_at")
+          .select("id, user_id, category, status, created_at, served_by")
           .in("status", ["waiting", "in_progress"])
           .order("created_at", { ascending: true }),
         s.from("stations").select("id, name, machine_type, status").order("name"),
@@ -80,10 +81,16 @@ export default function RemoteQueue() {
               return (
                 <li key={e.id} className={`flex items-center gap-3 rounded-xl border-l-4 ${meta?.border ?? "border-text-primary/30"} bg-card-bg px-4 py-3`}>
                   <span>{meta?.dot ?? "⚙️"}</span>
-                  <div>
+                  <div className="flex-1">
                     <p className="font-bold text-text-primary">{e.user_id}</p>
                     <p className="text-xs text-text-primary/60">{e.category}</p>
                   </div>
+                  {e.served_by && (
+                    <div className="text-right">
+                      <p className="text-xs text-text-primary/40">Hjälps av</p>
+                      <p className="text-xs font-medium text-text-primary/70">{e.served_by}</p>
+                    </div>
+                  )}
                 </li>
               );
             })}

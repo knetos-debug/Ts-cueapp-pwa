@@ -13,6 +13,7 @@ type QueueEntry = {
   category: string;
   status: string;
   created_at: string;
+  served_by: string | null;
 };
 
 // Delad AudioContext — måste skapas/låsas upp via användargest (webbläsarkrav)
@@ -75,7 +76,7 @@ export default function KioskQueue() {
       const [qRes, sRes] = await Promise.all([
         s
           .from("queue")
-          .select("id, user_id, category, status, created_at")
+          .select("id, user_id, category, status, created_at, served_by")
           .in("status", ["waiting", "in_progress"])
           .order("created_at", { ascending: true }),
         s.from("stations").select("id, name, machine_type, status"),
@@ -192,10 +193,16 @@ export default function KioskQueue() {
                   className={`flex items-center gap-4 rounded-xl border-l-4 ${meta?.border ?? "border-text-primary/30"} bg-card-bg px-5 py-4`}
                 >
                   <span className="text-2xl">{meta?.dot ?? "⚙️"}</span>
-                  <div>
+                  <div className="flex-1">
                     <p className="text-xl font-bold text-text-primary">{e.user_id}</p>
                     <p className="text-sm text-text-primary/60">{e.category}</p>
                   </div>
+                  {e.served_by && (
+                    <div className="text-right">
+                      <p className="text-xs text-text-primary/40">Hjälps av</p>
+                      <p className="text-sm font-medium text-text-primary/70">{e.served_by}</p>
+                    </div>
+                  )}
                 </li>
               );
             })}

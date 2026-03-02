@@ -54,19 +54,25 @@ export async function deleteQueueEntry(
 
 /**
  * Uppdatera status på en köpost — kräver user/superuser/admin-session.
+ * served_by sätts när status → in_progress, rensas när status → done.
  */
 export async function updateQueueStatus(
   id: string,
-  status: "in_progress" | "done"
+  status: "in_progress" | "done",
+  served_by?: string
 ): Promise<{ error?: string }> {
   const session = await getSession();
   if (!hasRole(session, "user")) {
     return { error: "Inte inloggad." };
   }
 
+  const updates: Record<string, unknown> = { status };
+  if (status === "in_progress" && served_by) updates.served_by = served_by;
+  if (status === "done") updates.served_by = null;
+
   const { error } = await adminClient()
     .from("queue")
-    .update({ status })
+    .update(updates)
     .eq("id", id);
 
   return error ? { error: "Åtgärden misslyckades. Försök igen." } : {};
