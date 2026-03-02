@@ -147,9 +147,10 @@ export default function KioskQueue() {
     : null;
 
   return (
-    <main className="container mx-auto max-w-2xl px-4 py-6 pb-10">
-      {/* ─── RUBRIK ──────────────────────────────────────────── */}
-      <div className="mb-6 flex items-start justify-between">
+    <main className="flex flex-col h-screen overflow-hidden container mx-auto max-w-2xl px-4 pt-6 pb-4">
+
+      {/* ─── RUBRIK — fast ───────────────────────────────────── */}
+      <div className="flex-none mb-5 flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight gradient-text">Kö</h1>
           <p className="text-sm text-text-primary/40 mt-1">Trainstation Makerspace</p>
@@ -169,13 +170,13 @@ export default function KioskQueue() {
       </div>
 
       {!isSupabaseConfigured && (
-        <p className="mb-4 rounded bg-card-bg p-4 text-text-primary/70 text-sm">
+        <p className="flex-none mb-4 rounded bg-card-bg p-4 text-text-primary/70 text-sm">
           Supabase är inte konfigurerad.
         </p>
       )}
 
-      {/* ─── NU BETJÄNAS ─────────────────────────────────────── */}
-      <section className="mb-5">
+      {/* ─── NU BETJÄNAS — fast ──────────────────────────────── */}
+      <section className="flex-none mb-4">
         <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
           Nu betjänas
         </h2>
@@ -210,9 +211,9 @@ export default function KioskQueue() {
         )}
       </section>
 
-      {/* ─── NÄSTA ───────────────────────────────────────────── */}
+      {/* ─── NÄSTA — fast ────────────────────────────────────── */}
       {next && (
-        <section className="mb-5">
+        <section className="flex-none mb-4">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
             Nästa
           </h2>
@@ -227,13 +228,13 @@ export default function KioskQueue() {
         </section>
       )}
 
-      {/* ─── I KÖN ───────────────────────────────────────────── */}
+      {/* ─── I KÖN — scrollbar ───────────────────────────────── */}
       {rest.length > 0 && (
-        <section className="mb-5">
-          <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
+        <section className="flex-1 min-h-0 mb-4 flex flex-col">
+          <h2 className="flex-none mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
             I kön
           </h2>
-          <ul className="space-y-2">
+          <ul className="flex-1 overflow-y-auto space-y-2 pr-1">
             {rest.map((e, i) => (
               <li
                 key={e.id}
@@ -255,22 +256,22 @@ export default function KioskQueue() {
 
       {/* ─── TOM KÖ ──────────────────────────────────────────── */}
       {queue.length === 0 && isSupabaseConfigured && (
-        <div className="mb-5 rounded-xl bg-card-bg p-8 text-center text-text-primary/50">
+        <div className="flex-none mb-4 rounded-xl bg-card-bg p-8 text-center text-text-primary/50">
           Kön är tom
         </div>
       )}
 
-      {/* ─── GÅ MED-KNAPP ────────────────────────────────────── */}
+      {/* ─── GÅ MED-KNAPP — fast ─────────────────────────────── */}
       <button
         onClick={() => setModalOpen(true)}
-        className="mb-6 w-full rounded-2xl bg-green-600 py-5 text-xl font-bold text-white hover:bg-green-700 active:scale-95 transition-transform"
+        className="flex-none mb-4 w-full rounded-2xl bg-green-600 py-5 text-xl font-bold text-white hover:bg-green-700 active:scale-95 transition-transform"
       >
         Ställ dig i kön  +
       </button>
 
-      {/* ─── MASKINSTATUS ────────────────────────────────────── */}
+      {/* ─── MASKINSTATUS — fast ─────────────────────────────── */}
       {stations.length > 0 && (
-        <section className="mb-6">
+        <section className="flex-none mb-3">
           <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
             Maskiner
           </h2>
@@ -278,8 +279,8 @@ export default function KioskQueue() {
         </section>
       )}
 
-      {/* ─── FOOTER ──────────────────────────────────────────── */}
-      <footer className="flex items-center justify-between border-t border-text-primary/10 pt-4 text-sm text-text-primary/50">
+      {/* ─── FOOTER — fast ───────────────────────────────────── */}
+      <footer className="flex-none flex items-center justify-between border-t border-text-primary/10 pt-3 text-sm text-text-primary/50">
         <span>
           {waiting.length} {waiting.length === 1 ? "person" : "personer"} i kö
           {waiting.length > 0 && ` · ${estWait(waiting.length)} väntetid`}
