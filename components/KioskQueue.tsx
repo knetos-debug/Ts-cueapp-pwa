@@ -15,10 +15,14 @@ type QueueEntry = {
   created_at: string;
 };
 
-/** Spelar ett "ding" när en person börjar betjänas */
+// Delad AudioContext — måste skapas/låsas upp via användargest (webbläsarkrav)
+let sharedAudioCtx: AudioContext | null = null;
+
+/** Spelar ett "ding" — kräver att sharedAudioCtx är upplåst */
 function playServedSound() {
+  if (!sharedAudioCtx || sharedAudioCtx.state !== "running") return;
   try {
-    const ctx = new AudioContext();
+    const ctx = sharedAudioCtx;
     const gain = ctx.createGain();
     gain.connect(ctx.destination);
     gain.gain.setValueAtTime(0.4, ctx.currentTime);
@@ -27,12 +31,12 @@ function playServedSound() {
     const osc = ctx.createOscillator();
     osc.connect(gain);
     osc.type = "sine";
-    osc.frequency.setValueAtTime(880, ctx.currentTime);        // A5
-    osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.12); // E6
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.12);
     osc.start(ctx.currentTime);
     osc.stop(ctx.currentTime + 0.7);
   } catch {
-    // Web Audio stöds ej — ignorera
+    // ignorera
   }
 }
 
@@ -46,8 +50,18 @@ export default function KioskQueue() {
   const [stations, setStations] = useState<Station[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [appUrl, setAppUrl] = useState("");
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const prevInProgressIds = useRef<Set<string>>(new Set());
   const isFirstLoad = useRef(true);
+
+  function handleUnlockAudio() {
+    try {
+      if (!sharedAudioCtx) sharedAudioCtx = new AudioContext();
+      sharedAudioCtx.resume().then(() => setAudioUnlocked(true));
+    } catch {
+      // ignorera
+    }
+  }
 
   useEffect(() => {
     setAppUrl(window.location.origin);
@@ -121,9 +135,23 @@ export default function KioskQueue() {
   return (
     <main className="container mx-auto max-w-2xl px-4 py-6 pb-10">
       {/* ─── RUBRIK ──────────────────────────────────────────── */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight gradient-text">Kö</h1>
-        <p className="text-sm text-text-primary/40 mt-1">Trainstation Makerspace</p>
+      <div className="mb-6 flex items-start justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight gradient-text">Kö</h1>
+          <p className="text-sm text-text-primary/40 mt-1">Trainstation Makerspace</p>
+        </div>
+        <button
+          onClick={handleUnlockAudio}
+          disabled={audioUnlocked}
+          className={`mt-1 rounded-lg px-3 py-1.5 text-xs transition-colors ${
+            audioUnlocked
+              ? "text-green-400/70 cursor-default"
+              : "text-text-primary/40 hover:bg-card-bg hover:text-text-primary/70"
+          }`}
+          title={audioUnlocked ? "Ljud är aktivt" : "Tryck för att aktivera ljud"}
+        >
+          {audioUnlocked ? "🔔 Ljud aktivt" : "🔕 Aktivera ljud"}
+        </button>
       </div>
 
       {!isSupabaseConfigured && (
