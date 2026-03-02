@@ -15,11 +15,12 @@ export default async function KioskLayout({
   }
 
   return (
-    <>
-      <header className="relative w-full overflow-hidden">
+    <div className="flex flex-col h-screen overflow-hidden">
+      <header className="flex-none relative w-full overflow-hidden">
         <MakerspaceBanner />
       </header>
       <div
+        className="flex-1 min-h-0"
         style={{
           paddingLeft: "env(safe-area-inset-left)",
           paddingRight: "env(safe-area-inset-right)",
@@ -28,6 +29,6 @@ export default async function KioskLayout({
       >
         {children}
       </div>
-    </>
+    </div>
   );
 }

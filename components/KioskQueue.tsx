@@ -147,7 +147,7 @@ export default function KioskQueue() {
     : null;
 
   return (
-    <main className="flex flex-col h-screen overflow-hidden container mx-auto max-w-2xl px-4 pt-6 pb-4">
+    <main className="flex flex-col h-full overflow-hidden container mx-auto max-w-2xl px-4 pt-6 pb-4">
 
       {/* ─── RUBRIK — fast ───────────────────────────────────── */}
       <div className="flex-none mb-5 flex items-start justify-between">
