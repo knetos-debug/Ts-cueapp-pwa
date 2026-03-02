@@ -115,7 +115,20 @@ export default function KioskQueue() {
       .on("postgres_changes", { event: "*", schema: "public", table: "stations" }, fetchAll)
       .subscribe();
 
-    return () => { s.removeChannel(channel); };
+    // Fallback-polling var 30:e sekund om realtime tappas
+    const pollInterval = setInterval(fetchAll, 30_000);
+
+    // Hämta direkt när skärmen vaknar eller fliken blir aktiv igen
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") fetchAll();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      s.removeChannel(channel);
+      clearInterval(pollInterval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, []);
 
   const handleJoinSubmit = async (user_id: string, category: string) => {
