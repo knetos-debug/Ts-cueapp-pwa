@@ -6,27 +6,6 @@ import { CATEGORIES, type Category } from "@/lib/categories";
 import { btn, btnBase } from "@/lib/buttonStyles";
 import CategoryCard from "./CategoryCard";
 
-/** Spelar ett kort "ding"-ljud via Web Audio API — ingen ljudfil behövs */
-function playSuccessSound() {
-  try {
-    const ctx = new AudioContext();
-    const gain = ctx.createGain();
-    gain.connect(ctx.destination);
-    gain.gain.setValueAtTime(0.4, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
-
-    const osc = ctx.createOscillator();
-    osc.connect(gain);
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(880, ctx.currentTime);       // A5
-    osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.1); // E6
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.6);
-  } catch {
-    // Ljud stöds ej i denna webbläsare — ignorera
-  }
-}
-
 type QueueEntry = { category: string };
 
 type JoinQueueModalProps = {
@@ -88,7 +67,6 @@ export default function JoinQueueModal({
     setSubmitting(true);
     try {
       await onSubmit(user_id.trim(), category);
-      playSuccessSound();
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Något gick fel.");

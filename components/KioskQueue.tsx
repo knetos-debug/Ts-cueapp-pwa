@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase/client";
 import { CATEGORY_META } from "@/lib/categories";
 import { joinQueue } from "@/app/actions/queue";
@@ -15,6 +15,27 @@ type QueueEntry = {
   created_at: string;
 };
 
+/** Spelar ett "ding" när en person börjar betjänas */
+function playServedSound() {
+  try {
+    const ctx = new AudioContext();
+    const gain = ctx.createGain();
+    gain.connect(ctx.destination);
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.7);
+
+    const osc = ctx.createOscillator();
+    osc.connect(gain);
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime);        // A5
+    osc.frequency.setValueAtTime(1320, ctx.currentTime + 0.12); // E6
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.7);
+  } catch {
+    // Web Audio stöds ej — ignorera
+  }
+}
+
 function estWait(count: number) {
   const min = count * 15;
   return min >= 60 ? `~${Math.round(min / 60)}h` : `~${min}m`;
@@ -25,6 +46,8 @@ export default function KioskQueue() {
   const [stations, setStations] = useState<Station[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [appUrl, setAppUrl] = useState("");
+  const prevInProgressIds = useRef<Set<string>>(new Set());
+  const isFirstLoad = useRef(true);
 
   useEffect(() => {
     setAppUrl(window.location.origin);
@@ -43,7 +66,30 @@ export default function KioskQueue() {
           .order("created_at", { ascending: true }),
         s.from("stations").select("id, name, machine_type, status"),
       ]);
-      if (!qRes.error) setQueue((qRes.data as QueueEntry[]) ?? []);
+
+      if (!qRes.error) {
+        const newQueue = (qRes.data as QueueEntry[]) ?? [];
+
+        // Spela ljud om ett nytt in_progress-ID dyker upp (ej vid första laddning)
+        if (!isFirstLoad.current) {
+          const newInProgressIds = new Set(
+            newQueue.filter((e) => e.status === "in_progress").map((e) => e.id)
+          );
+          const hasNewServed = [...newInProgressIds].some(
+            (id) => !prevInProgressIds.current.has(id)
+          );
+          if (hasNewServed) playServedSound();
+          prevInProgressIds.current = newInProgressIds;
+        } else {
+          // Första laddning — spara nuvarande IDs utan att spela ljud
+          prevInProgressIds.current = new Set(
+            newQueue.filter((e) => e.status === "in_progress").map((e) => e.id)
+          );
+          isFirstLoad.current = false;
+        }
+
+        setQueue(newQueue);
+      }
       if (!sRes.error) setStations((sRes.data as Station[]) ?? []);
     };
 
