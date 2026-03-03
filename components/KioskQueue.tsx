@@ -213,17 +213,17 @@ export default function KioskQueue() {
 
       {/* ─── NÄSTA — fast ────────────────────────────────────── */}
       {next && (
-        <section className="flex-none mb-4">
-          <h2 className="mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
+        <section className="flex-none mb-3">
+          <h2 className="mb-1.5 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
             Nästa
           </h2>
-          <div className="flex items-center gap-4 rounded-xl bg-card-bg px-5 py-4">
-            <span className="text-2xl">{CATEGORY_META[next.category as keyof typeof CATEGORY_META]?.dot ?? "⚙️"}</span>
+          <div className="flex items-center gap-3 rounded-xl bg-card-bg px-4 py-2.5">
+            <span className="text-lg">{CATEGORY_META[next.category as keyof typeof CATEGORY_META]?.dot ?? "⚙️"}</span>
             <div className="flex-1">
-              <p className="text-lg font-semibold text-text-primary">{next.user_id}</p>
-              <p className="text-sm text-text-primary/60">{next.category}</p>
+              <p className="text-base font-medium text-text-primary">{next.user_id}</p>
+              <p className="text-xs text-text-primary/60">{next.category}</p>
             </div>
-            <span className="text-sm text-text-primary/50">⏱ {estWait(1)}</span>
+            <span className="text-xs text-text-primary/50">⏱ {estWait(1)}</span>
           </div>
         </section>
       )}
@@ -234,19 +234,19 @@ export default function KioskQueue() {
           <h2 className="flex-none mb-2 text-xs font-semibold uppercase tracking-widest text-text-primary/50">
             I kön
           </h2>
-          <ul className="flex-1 overflow-y-auto space-y-2 pr-1">
+          <ul className="flex-1 overflow-y-auto space-y-1.5 pr-1">
             {rest.map((e, i) => (
               <li
                 key={e.id}
-                className="flex items-center gap-3 rounded-xl bg-card-bg px-5 py-3"
+                className="flex items-center gap-2.5 rounded-xl bg-card-bg px-4 py-2"
               >
-                <span className="w-6 text-center text-sm font-bold text-text-primary/40">
+                <span className="w-5 text-center text-xs font-bold text-text-primary/40">
                   {i + 2}
                 </span>
-                <span className="text-lg">{CATEGORY_META[e.category as keyof typeof CATEGORY_META]?.dot ?? "⚙️"}</span>
+                <span className="text-base">{CATEGORY_META[e.category as keyof typeof CATEGORY_META]?.dot ?? "⚙️"}</span>
                 <div className="flex-1">
-                  <p className="font-medium text-text-primary">{e.user_id}</p>
-                  <p className="text-sm text-text-primary/60">{e.category}</p>
+                  <p className="text-sm font-medium text-text-primary">{e.user_id}</p>
+                  <p className="text-xs text-text-primary/60">{e.category}</p>
                 </div>
               </li>
             ))}

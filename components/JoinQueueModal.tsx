@@ -91,34 +91,6 @@ export default function JoinQueueModal({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Medlems-ID */}
-          <div>
-            <label className="mb-2 block text-sm font-medium text-text-primary/80">
-              Medlems-ID
-            </label>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={user_id}
-                onChange={(e) => setUser_id(e.target.value)}
-                placeholder="Skriv eller skanna QR"
-                className="flex-1 rounded-xl border border-text-primary/20 bg-bg-main px-4 py-3 text-text-primary placeholder:text-text-primary/40 focus:border-accent-ink focus:outline-none"
-              />
-              <button
-                type="button"
-                onClick={() => setScanning(true)}
-                disabled={scanning}
-                className={`rounded-xl px-4 py-3 text-sm font-medium transition-colors ${btn.zinc} disabled:opacity-50`}
-              >
-                {scanning ? "Skannar…" : "📷 QR"}
-              </button>
-            </div>
-          </div>
-
-          {scanning && (
-            <div id="qr-reader" className="overflow-hidden rounded-xl" />
-          )}
-
           {/* Kategori-kort */}
           <div>
             <label className="mb-2 block text-sm font-medium text-text-primary/80">
@@ -135,6 +107,49 @@ export default function JoinQueueModal({
                 />
               ))}
             </div>
+          </div>
+
+          {/* Namn / QR — längst ner */}
+          <div>
+            <label className="mb-2 block text-sm font-medium text-text-primary/80">
+              Ditt namn eller medlems-ID
+            </label>
+            <input
+              type="text"
+              value={user_id}
+              onChange={(e) => setUser_id(e.target.value)}
+              placeholder="SKRIV NAMN HÄR"
+              className="w-full rounded-xl border border-text-primary/20 bg-bg-main px-4 py-3 text-text-primary placeholder:text-text-primary/30 placeholder:font-semibold placeholder:tracking-wide focus:border-accent-ink focus:outline-none"
+            />
+
+            {/* QR-scan-knapp */}
+            {!scanning && (
+              <button
+                type="button"
+                onClick={() => setScanning(true)}
+                className={`mt-3 w-full rounded-xl py-4 text-base font-semibold transition-colors ${btn.zinc}`}
+              >
+                <span className="mr-2 text-2xl">📷</span>
+                Skanna QR-kod istället
+              </button>
+            )}
+
+            {/* QR-scanner */}
+            {scanning && (
+              <div className="mt-3">
+                <p className="mb-2 text-center text-sm text-text-primary/60">
+                  Håll QR-koden framför kameran
+                </p>
+                <div id="qr-reader" className="overflow-hidden rounded-xl" />
+                <button
+                  type="button"
+                  onClick={() => setScanning(false)}
+                  className={`mt-2 w-full rounded-xl py-3 text-sm font-medium transition-colors ${btn.zinc}`}
+                >
+                  Avbryt skanning
+                </button>
+              </div>
+            )}
           </div>
 
           {error && <p className="text-sm text-red-400">{error}</p>}
